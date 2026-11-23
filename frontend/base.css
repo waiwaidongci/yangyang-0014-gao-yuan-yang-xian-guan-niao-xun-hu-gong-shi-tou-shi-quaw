@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap');
+:root {
+  --s-page: oklch(96% .019 85); --s-panel: oklch(98% .012 84); --s-ink: oklch(26% .026 78);
+  --s-muted: oklch(46% .026 78); --s-line: oklch(80% .043 83);
+  --s-accent: oklch(43% .104 53); --s-onaccent: oklch(98% .012 84);
+  --s-error: oklch(41% .15 25); --s-ok: oklch(40% .088 154);
+  --s-body: "DM Sans", "Noto Sans SC", sans-serif; --s-display: "Noto Serif SC", Georgia, serif;
+  color: var(--s-ink); background: var(--s-page); font: 15px/1.55 var(--s-body);
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; min-width: 300px; }
+h1, h2, h3, p { margin-block: 0 .65em; }
+h1, h2 { font-family: var(--s-display); }
+h1 { font-size: clamp(1.8rem, 3.8vw, 3rem); line-height: 1.15; }
+h2 { font-size: clamp(1.17rem, 2vw, 1.55rem); line-height: 1.25; }
+button, input, select, textarea { font: inherit; }
+button, select { cursor: pointer; }
+button { border: 1px solid var(--s-accent); background: var(--s-accent); color: var(--s-onaccent); padding: .48rem .9rem; }
+button:not(:disabled):hover { filter: brightness(1.14); }
+button:disabled { opacity: .54; cursor: wait; }
+button.quiet { color: var(--s-ink); border-color: var(--s-line); background: transparent; }
+input, select, textarea { max-width: 100%; color: var(--s-ink); background: var(--s-panel); border: 1px solid var(--s-line); padding: .5rem .6rem; }
+:focus-visible { outline: 2px solid var(--s-accent); outline-offset: 3px; }
+label { display: grid; gap: .25rem; }
+a { color: var(--s-accent); }
+small, .muted { color: var(--s-muted); }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; text-align: left; }
+th, td { border-bottom: 1px solid var(--s-line); padding: .55rem .6rem; }
+th { text-align: inherit; }
+.status-chip { display: inline-block; padding: .1rem .45rem; border: 1px solid var(--s-line); font-size: .82rem; }
+[role=status], .empty-state { min-height: 1.5rem; }
+[data-type=error], [role=alert] { color: var(--s-error); }
+[data-type=success] { color: var(--s-ok); }
+.workbench { margin: 0 auto; max-width: 1640px; padding: 0 clamp(16px,4vw,70px); }
+.masthead { display: flex; justify-content: space-between; gap: 1rem; align-items: center; padding: 1.5rem 0 1.2rem; border-top: 5px solid var(--s-accent); border-bottom: 1px solid var(--s-line); }
+.masthead-title strong { display: block; font: 650 clamp(1.15rem, 2vw, 1.8rem)/1.25 var(--s-display); }
+.kicker { color: var(--s-accent); font-weight: 700; font-size: .77rem; letter-spacing: .10em; margin-bottom: .3rem; }
+.session { display: flex; align-items: center; gap: .7rem; white-space: nowrap; }
+.workbench-nav { display: flex; flex-wrap: wrap; gap: 0 .4rem; border-bottom: 1px solid var(--s-line); }
+.workbench-nav a { text-decoration: none; color: var(--s-muted); padding: .65rem .85rem; border-bottom: 3px solid transparent; }
+.workbench-nav a[aria-current=page] { color: var(--s-accent); border-color: currentColor; font-weight: 700; }
+.outlet { padding: 1.45rem 0 3rem; min-width: 0; }
+.outlet[aria-busy=false] { animation: appear .25s cubic-bezier(.1,.8,.2,1); }
+@keyframes appear { from { opacity: .45; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+.signin { max-width: 1100px; margin: 0 auto; min-height: 90vh; padding: 2rem; display: grid; grid-template-columns: 1.25fr 1fr; align-content: center; gap: clamp(2rem,8vw,8rem); }
+.signin-heading { border-top: 6px solid var(--s-accent); padding-top: 1rem; align-self: center; }
+.signin-form { display: grid; align-content: center; gap: .9rem; background: var(--s-panel); border: 1px solid var(--s-line); padding: clamp(1rem,4vw,3rem); }
+.signin-form p { margin: 0; }
+@media(max-width: 767px) {
+  .signin { grid-template-columns: 1fr; gap: 1.4rem; min-height: 0; padding: 3rem 1rem; }
+  .workbench-nav a { padding: .55rem .55rem; }
+  .outlet { padding-top: 1rem; }
+}
+@media(prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }

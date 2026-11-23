@@ -1,0 +1,87 @@
+name: yangyang-bird-effort
+x-runtime: &runtime
+  image: yangyang-bird-effort-python:local
+  environment:
+    DATABASE_URL: postgresql://app:${POSTGRES_PASSWORD:-yangyang-local-db}@db:5432/business
+    REDIS_URL: redis://redis:6379/0
+    JWT_SECRET: ${JWT_SECRET:-yangyang-local-demo-secret-change-before-deploy}
+    APP_NAME: ${COMPOSE_PROJECT_NAME:-yangyang-bird-effort}
+    SEED_DEMO: ${SEED_DEMO:-true}
+    DEMO_PASSWORD: ${DEMO_PASSWORD:-Demo2026!}
+  depends_on: &infrastructure
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  volumes:
+    - artifacts:/artifacts
+services:
+  frontend:
+    build: ./frontend
+    container_name: ${COMPOSE_PROJECT_NAME:-yangyang-bird-effort}-frontend
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-18295}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD-SHELL, 'wget -qO /dev/null http://127.0.0.1/']
+      interval: 2s
+      timeout: 4s
+      retries: 15
+  backend:
+    <<: *runtime
+    build: ./backend
+    container_name: ${COMPOSE_PROJECT_NAME:-yangyang-bird-effort}-backend
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-19295}:8000"
+    healthcheck:
+      test: [CMD, python, -c, "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 2s
+      timeout: 4s
+      retries: 15
+  worker:
+    <<: *runtime
+    pull_policy: never
+    depends_on:
+      <<: *infrastructure
+      backend:
+        condition: service_healthy
+    command: [python, worker.py]
+    container_name: ${COMPOSE_PROJECT_NAME:-yangyang-bird-effort}-worker
+    healthcheck:
+      test: [CMD, python, -c, "from pathlib import Path; from time import time; raise SystemExit(time() - Path('/tmp/yangyang-worker-heartbeat').stat().st_mtime > 25)"]
+      interval: 2s
+      timeout: 4s
+      retries: 15
+  db:
+    image: postgres:16-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-yangyang-bird-effort}-db
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-yangyang-local-db}
+      POSTGRES_DB: business
+    ports:
+      - "127.0.0.1:${DB_PORT:-17795}:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD, pg_isready, -U, app, -d, business]
+      interval: 2s
+      timeout: 4s
+      retries: 15
+  redis:
+    image: redis:7-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-yangyang-bird-effort}-redis
+    command: [redis-server, --appendonly, 'yes']
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 2s
+      timeout: 4s
+      retries: 15
+volumes:
+  postgres:
+  redis:
+  artifacts:

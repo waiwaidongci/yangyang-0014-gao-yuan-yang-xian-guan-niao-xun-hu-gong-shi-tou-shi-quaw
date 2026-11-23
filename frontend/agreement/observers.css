@@ -1,0 +1,9 @@
+.agreement-grid{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(14rem,1fr);gap:1rem;align-items:start}
+.agreement-ticket{border-block-start:1px solid var(--s-line);padding:.7rem 0}
+.observer-sheet{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+.observer-sheet > div{background:var(--green-paper);padding:.55rem}
+.observer-sheet p{margin:.3rem 0;color:var(--s-muted)}
+.agreement-score{margin:.7rem 0}.agreement-score strong{font:700 1.5rem var(--field-numeric);color:var(--s-accent)}
+.bird-tally-fields{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.4rem}
+@media(max-width:760px){.agreement-grid{grid-template-columns:1fr}}
+@media(max-width:455px){.bird-tally-fields{grid-template-columns:repeat(3,minmax(0,1fr))}}

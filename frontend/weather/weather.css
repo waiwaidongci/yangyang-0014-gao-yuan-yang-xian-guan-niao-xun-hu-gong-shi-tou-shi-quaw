@@ -1,0 +1,10 @@
+.condition-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(14rem,1fr);gap:1rem;align-items:start}
+.weather-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+.condition-check{padding:.8rem;background:var(--green-paper);min-width:0}
+.condition-check dl{display:grid;grid-template-columns:1fr 1.4fr;gap:.3rem .5rem}
+.condition-check dd{margin:0;font-weight:600}
+.condition-check h2{padding-bottom:.45rem;border-bottom:1px dashed var(--s-line)}
+.condition-result{border-left:3px solid var(--s-accent);padding:.55rem .7rem}
+.condition-result[data-usable="false"]{border-color:var(--s-error);color:var(--s-error)}
+@media(max-width:820px){.condition-layout{grid-template-columns:1fr}}
+@media(max-width:455px){.weather-columns{grid-template-columns:1fr}}

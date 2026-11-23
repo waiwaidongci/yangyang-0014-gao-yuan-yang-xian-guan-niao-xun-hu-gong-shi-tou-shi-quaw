@@ -1,0 +1,11 @@
+.edition-grid{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(14rem,1fr);gap:1rem;align-items:start}
+.edition-record{padding:.8rem 0;border-top:1px solid var(--s-line)}
+.edition-caption{display:grid;grid-template-columns:auto 1fr;gap:.65rem;align-items:start}
+.edition-caption > span{padding:.15rem .5rem;color:var(--s-onaccent);background:var(--s-accent);font:700 1.3rem var(--field-numeric)}
+.edition-caption h2,.edition-caption p{margin:0 0 .3rem}
+.edition-caption p{font-size:.85rem;color:var(--s-muted)}
+.edition-record ul{list-style:none;padding:0;margin:.55rem 0;display:grid;gap:.3rem}
+.edition-record li{border-top:1px dashed var(--s-line);padding:.45rem 0;display:flex;justify-content:space-between;align-items:center}
+.edition-record li form{margin:0}
+.edition-grid fieldset{border:1px solid var(--s-line)}
+@media(max-width:760px){.edition-grid{grid-template-columns:1fr}}
