@@ -113,13 +113,30 @@ def freeze_snapshot(cx, snapshot_id):
     pending = cx.execute("SELECT * FROM effort_snapshot WHERE id=%s FOR UPDATE", (snapshot_id,)).fetchone()
     if not pending or pending["status"] != "building":
         raise HTTPException(409, "仅可冻结正在编制的透视")
+    # One consistent read of walks and rebook chains: a concurrent review is
+    # seen either fully before or fully after the handover, never mixed.
+    # Repeats anchor to their original walk's walked_on instead of their own.
     patrols = cx.execute(
-        """SELECT w.*,r.cover,r.label AS route_label,coalesce(sum(e.tally),0) AS observed_count
-           FROM patrol_walk w JOIN transect_route r ON w.route_code=r.code
+        """WITH RECURSIVE lineage AS (
+               SELECT w.id AS root_id, w.id AS walk_id, 0 AS depth
+               FROM patrol_walk w
+               WHERE w.walked_on BETWEEN %s AND %s
+                 AND NOT EXISTS (SELECT 1 FROM observer_comparison oc WHERE oc.repeat_walk=w.id)
+               UNION ALL
+               SELECT lineage.root_id, oc.repeat_walk, lineage.depth+1
+               FROM lineage
+               JOIN observer_comparison oc ON oc.source_walk=lineage.walk_id
+                  AND oc.decision='repeat_booked'
+           )
+           SELECT w.*,r.cover,r.label AS route_label,coalesce(sum(e.tally),0) AS observed_count,
+                  lineage.root_id,lineage.depth
+           FROM lineage
+           JOIN patrol_walk w ON w.id=lineage.walk_id
+           JOIN transect_route r ON w.route_code=r.code
            LEFT JOIN bird_encounter e ON e.walk_id=w.id AND (%s::text IS NULL OR e.taxon=%s)
-           WHERE w.walked_on BETWEEN %s AND %s
-           GROUP BY w.id,r.code ORDER BY w.walked_on,w.id""",
-        (pending["taxon"], pending["taxon"], pending["date_from"], pending["date_to"])
+           GROUP BY w.id,r.code,lineage.root_id,lineage.depth
+           ORDER BY lineage.root_id,lineage.depth""",
+        (pending["date_from"], pending["date_to"], pending["taxon"], pending["taxon"])
     ).fetchall()
     result = aggregate(patrols, pending["row_axis"], pending["col_axis"])
     cx.execute("UPDATE effort_snapshot SET status='frozen', result=%s, frozen_at=now() WHERE id=%s",

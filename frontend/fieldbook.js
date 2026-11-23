@@ -97,6 +97,8 @@ function pivot(view,role) {
         </table></div>` : '<p>当前范围暂无已复核的有效巡护。</p>'}
       ${result ? `<details class="trace-note"><summary>复核范围：纳入 ${result.included_walks.length} 班 · 剔除 ${result.excluded_walks.length} 班 · 未复核 ${result.unreviewed_walks.length} 班</summary>
         <p>纳入：${result.included_walks.map(ref).join('、') || '无'}</p>
+        ${result.makeup_walks?.length ? `<p>补走计入：${result.makeup_walks.map(row => `${ref(row.id)}（原班 ${ref(row.source_walk)}，日期与周归属随原班）`).join('、')}</p>` : ''}
+        ${result.superseded_walks?.length ? `<p>复点未过暂停计入：${result.superseded_walks.map(row => `${ref(row.id)}（由 ${ref(row.replaced_by)} 接替）`).join('、')}</p>` : ''}
         <ul>${result.excluded_walks.map(row => `<li>${ref(row.id)} · ${h(row.reason)}</li>`).join('')}</ul></details>` : ''}
     </section><aside class="field-panel snapshot-form"><h2>统计口径</h2>
       ${view.snapshots.length ? selectField('snapshot','已存透视',Object.fromEntries(view.snapshots.map(row => [row.id,row.label])),item?.id) : ''}

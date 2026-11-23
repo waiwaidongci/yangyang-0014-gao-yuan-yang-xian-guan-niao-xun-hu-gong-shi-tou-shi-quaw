@@ -61,6 +61,11 @@ def assess(cx,id,reviewer):
 
 def rebook(cx,id,data):
     task = comparison_for(cx,id,lock=True)
+    if task["decision"] == "repeat_booked":
+        booked = walk_for(cx,task["repeat_walk"])
+        if booked["walked_on"] == data.walked_on and booked["crew"] == data.crew:
+            return task
+        raise HTTPException(409,"该复点已安排其他补走班")
     if task["decision"] != "repeat_required":
         raise HTTPException(409,"当前复点不需再走样线")
     source = walk_for(cx,task["source_walk"])
